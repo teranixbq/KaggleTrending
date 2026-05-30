@@ -6,8 +6,7 @@ from kaggle.api.kaggle_api_extended import KaggleApi
 def fetch_trending():
     print("Fetching trending datasets using Kaggle API...")
     try:
-        # The library will look for KAGGLE_USERNAME and KAGGLE_KEY
-        # OR KAGGLE_API_TOKEN environment variables.
+        # Authenticate using KAGGLE_USERNAME and KAGGLE_KEY environment variables
         api = KaggleApi()
         api.authenticate()
         
@@ -15,6 +14,9 @@ def fetch_trending():
         datasets = api.dataset_list(sort_by='hottest')
     except Exception as e:
         print(f"Error fetching datasets: {e}")
+        # Print environment variables for debugging (without showing the key)
+        print(f"KAGGLE_USERNAME: {os.environ.get('KAGGLE_USERNAME')}")
+        print(f"KAGGLE_KEY present: {'Yes' if os.environ.get('KAGGLE_KEY') else 'No'}")
         return
 
     if not datasets:
