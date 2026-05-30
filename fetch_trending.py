@@ -6,12 +6,10 @@ from kaggle.api.kaggle_api_extended import KaggleApi
 def fetch_trending():
     print("Fetching trending datasets using Kaggle API...")
     try:
-        # Authenticate using KAGGLE_USERNAME and KAGGLE_KEY environment variables
         api = KaggleApi()
         api.authenticate()
         
         # List datasets with tag 'trendingDataset' sorted by 'hottest'
-        # 'hottest' is the API equivalent for Trending/Popularity-over-time
         datasets = api.dataset_list(tag_ids='trendingDataset', sort_by='hottest')
     except Exception as e:
         print(f"Error authenticating or fetching datasets: {e}")
@@ -21,11 +19,16 @@ def fetch_trending():
         print("No trending datasets found.")
         return
 
-    # Extract relevant data
     data_list = []
     for ds in datasets:
+        # Based on debug output, the object has a to_dict() method or __dict__ attribute
+        if hasattr(ds, 'to_dict'):
+            d = ds.to_dict()
+        else:
+            d = vars(ds)
+
         # Helper to convert bytes to human readable format
-        total_bytes = getattr(ds, 'totalBytes', 0)
+        total_bytes = d.get('totalBytes', 0)
         if total_bytes:
             if total_bytes < 1024:
                 size_str = f"{total_bytes} B"
@@ -39,16 +42,14 @@ def fetch_trending():
             size_str = "N/A"
 
         data_list.append({
-            'ref': getattr(ds, 'ref', ''),
-            'title': getattr(ds, 'title', '').strip(),
+            'ref': d.get('ref', ''),
+            'title': str(d.get('title', '')).strip(),
             'size': size_str,
-            'lastUpdated': getattr(ds, 'lastUpdated', 'N/A'),
-            'downloadCount': int(getattr(ds, 'downloadCount', 0)),
-            'voteCount': int(getattr(ds, 'voteCount', 0)),
-            'viewCount': int(getattr(ds, 'viewCount', 0)),
-            'ownerName': getattr(ds, 'ownerName', 'N/A'),
-            'kernelCount': int(getattr(ds, 'kernelCount', 0)),
-            'url': getattr(ds, 'url', f"https://www.kaggle.com/datasets/{getattr(ds, 'ref', '')}"),
+            'lastUpdated': d.get('lastUpdated', 'N/A'),
+            'downloadCount': int(d.get('downloadCount', 0)),
+            'voteCount': int(d.get('voteCount', 0)),
+            'viewCount': int(d.get('viewCount', 0)),
+            'url': d.get('url', f"https://www.kaggle.com/datasets/{d.get('ref', '')}"),
             'fetch_date': datetime.now().isoformat()
         })
 
