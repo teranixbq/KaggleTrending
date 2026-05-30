@@ -1,14 +1,18 @@
 import os
 import pandas as pd
 from datetime import datetime
-import kagglehub
+from kaggle.api.kaggle_api_extended import KaggleApi
 
 def fetch_trending():
-    print("Fetching trending datasets using kagglehub...")
+    print("Fetching trending datasets using Kaggle API...")
     try:
-        # kagglehub will automatically use KAGGLE_API_TOKEN environment variable
-        # or KAGGLE_USERNAME and KAGGLE_KEY if provided.
-        datasets = kagglehub.dataset_list(sort_by="hottest")
+        # The library will look for KAGGLE_USERNAME and KAGGLE_KEY
+        # OR KAGGLE_API_TOKEN environment variables.
+        api = KaggleApi()
+        api.authenticate()
+        
+        # List trending (hottest) datasets
+        datasets = api.dataset_list(sort_by='hottest')
     except Exception as e:
         print(f"Error fetching datasets: {e}")
         return
@@ -18,33 +22,17 @@ def fetch_trending():
         return
 
     # Extract relevant data
-    # Note: kagglehub returns a list of dataset objects/dictionaries
     data_list = []
     for ds in datasets:
-        # Check if ds is an object with attributes or a dictionary
-        if hasattr(ds, 'ref'):
-            ref = ds.ref
-            title = ds.title
-            size = getattr(ds, 'size', 'N/A')
-            lastUpdated = getattr(ds, 'lastUpdated', 'N/A')
-            downloadCount = getattr(ds, 'downloadCount', 0)
-            voteCount = getattr(ds, 'voteCount', 0)
-        else:
-            ref = ds.get('ref', '')
-            title = ds.get('title', '')
-            size = ds.get('size', 'N/A')
-            lastUpdated = ds.get('lastUpdated', 'N/A')
-            downloadCount = ds.get('downloadCount', 0)
-            voteCount = ds.get('voteCount', 0)
-
         data_list.append({
-            'ref': ref,
-            'title': title,
-            'size': size,
-            'lastUpdated': lastUpdated,
-            'downloadCount': downloadCount,
-            'voteCount': voteCount,
-            'url': f"https://www.kaggle.com/datasets/{ref}",
+            'ref': ds.ref,
+            'title': ds.title,
+            'size': ds.size,
+            'lastUpdated': ds.lastUpdated,
+            'downloadCount': ds.downloadCount,
+            'voteCount': ds.voteCount,
+            'usabilityRating': ds.usabilityRating,
+            'url': f"https://www.kaggle.com/datasets/{ds.ref}",
             'fetch_date': datetime.now().isoformat()
         })
 
