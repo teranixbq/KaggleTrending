@@ -23,14 +23,17 @@ def fetch_trending():
 
     # Extract relevant data
     data_list = []
-    for ds in datasets:
-        # For debugging: print the attributes of the first dataset to see what's available
-        # This will show in the GitHub Actions log
-        if not data_list:
-            print("Inspecting first dataset attributes...")
-            for attr in dir(ds):
-                if not attr.startswith('_'):
-                    print(f"  {attr}: {getattr(ds, attr, 'N/A')}")
+    for i, ds in enumerate(datasets):
+        # DEBUG: Print the raw dictionary of the first 2 datasets to logs
+        if i < 2:
+            print(f"\n--- DEBUG DATASET {i} ---")
+            import pprint
+            # Kaggle API objects often have a __dict__ or to_dict() method
+            if hasattr(ds, 'to_dict'):
+                pprint.pprint(ds.to_dict())
+            else:
+                pprint.pprint(vars(ds))
+            print("------------------------\n")
 
         data_list.append({
             'ref': getattr(ds, 'ref', ''),
