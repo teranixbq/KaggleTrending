@@ -13,10 +13,7 @@ def fetch_trending():
         # List trending (hottest) datasets
         datasets = api.dataset_list(sort_by='hottest')
     except Exception as e:
-        print(f"Error fetching datasets: {e}")
-        # Print environment variables for debugging (without showing the key)
-        print(f"KAGGLE_USERNAME: {os.environ.get('KAGGLE_USERNAME')}")
-        print(f"KAGGLE_KEY present: {'Yes' if os.environ.get('KAGGLE_KEY') else 'No'}")
+        print(f"Error authenticating or fetching datasets: {e}")
         return
 
     if not datasets:
@@ -26,15 +23,18 @@ def fetch_trending():
     # Extract relevant data
     data_list = []
     for ds in datasets:
+        # The ApiDataset object has specific attribute names
+        # ref, title, size, lastUpdated, downloadCount, voteCount, usabilityRating
+        # Using getattr to be safe
         data_list.append({
-            'ref': ds.ref,
-            'title': ds.title,
-            'size': ds.size,
-            'lastUpdated': ds.lastUpdated,
-            'downloadCount': ds.downloadCount,
-            'voteCount': ds.voteCount,
-            'usabilityRating': ds.usabilityRating,
-            'url': f"https://www.kaggle.com/datasets/{ds.ref}",
+            'ref': getattr(ds, 'ref', ''),
+            'title': getattr(ds, 'title', ''),
+            'size': getattr(ds, 'size', 'N/A'),
+            'lastUpdated': str(getattr(ds, 'lastUpdated', 'N/A')),
+            'downloadCount': getattr(ds, 'downloadCount', 0),
+            'voteCount': getattr(ds, 'voteCount', 0),
+            'usabilityRating': getattr(ds, 'usabilityRating', 0),
+            'url': f"https://www.kaggle.com/datasets/{getattr(ds, 'ref', '')}",
             'fetch_date': datetime.now().isoformat()
         })
 
