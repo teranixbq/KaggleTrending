@@ -46,7 +46,6 @@ def fetch_trending():
             'downloadCount': int(getattr(ds, 'downloadCount', 0)),
             'voteCount': int(getattr(ds, 'voteCount', 0)),
             'viewCount': int(getattr(ds, 'viewCount', 0)),
-            'usabilityRating': float(getattr(ds, 'usabilityRating', 0)),
             'ownerName': getattr(ds, 'ownerName', 'N/A'),
             'kernelCount': int(getattr(ds, 'kernelCount', 0)),
             'url': getattr(ds, 'url', f"https://www.kaggle.com/datasets/{getattr(ds, 'ref', '')}"),
