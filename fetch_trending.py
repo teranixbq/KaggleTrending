@@ -12,7 +12,6 @@ def fetch_trending():
         
         # List datasets with tag 'trendingDataset' sorted by 'hottest'
         # 'hottest' is the API equivalent for Trending/Popularity-over-time
-        # to match the "Trending" section on the web
         datasets = api.dataset_list(tag_ids='trendingDataset', sort_by='hottest')
     except Exception as e:
         print(f"Error authenticating or fetching datasets: {e}")
@@ -25,17 +24,26 @@ def fetch_trending():
     # Extract relevant data
     data_list = []
     for ds in datasets:
-        # The ApiDataset object has specific attribute names
-        # ref, title, size, lastUpdated, downloadCount, voteCount, usabilityRating
-        # Using getattr to be safe
+        # For debugging: print the attributes of the first dataset to see what's available
+        # This will show in the GitHub Actions log
+        if not data_list:
+            print("Inspecting first dataset attributes...")
+            for attr in dir(ds):
+                if not attr.startswith('_'):
+                    print(f"  {attr}: {getattr(ds, attr, 'N/A')}")
+
         data_list.append({
             'ref': getattr(ds, 'ref', ''),
             'title': getattr(ds, 'title', ''),
             'size': getattr(ds, 'size', 'N/A'),
             'lastUpdated': str(getattr(ds, 'lastUpdated', 'N/A')),
-            'downloadCount': getattr(ds, 'downloadCount', 0),
-            'voteCount': getattr(ds, 'voteCount', 0),
-            'usabilityRating': getattr(ds, 'usabilityRating', 0),
+            'downloadCount': int(getattr(ds, 'downloadCount', 0)),
+            'voteCount': int(getattr(ds, 'voteCount', 0)),
+            'viewCount': int(getattr(ds, 'viewCount', 0)),
+            'usabilityRating': float(getattr(ds, 'usabilityRating', 0)),
+            'ownerName': getattr(ds, 'ownerName', 'N/A'),
+            'ownerRef': getattr(ds, 'ownerRef', 'N/A'),
+            'kernelCount': int(getattr(ds, 'kernelCount', 0)),
             'url': f"https://www.kaggle.com/datasets/{getattr(ds, 'ref', '')}",
             'fetch_date': datetime.now().isoformat()
         })
