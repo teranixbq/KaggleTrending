@@ -10,8 +10,9 @@ def fetch_trending():
         api = KaggleApi()
         api.authenticate()
         
-        # List trending (hottest) datasets
-        datasets = api.dataset_list(sort_by='hottest')
+        # List datasets with tag 'trendingDataset' sorted by 'active'
+        # to match https://www.kaggle.com/datasets?topic=trendingDataset&sort=active
+        datasets = api.dataset_list(tag_ids='trendingDataset', sort_by='active')
     except Exception as e:
         print(f"Error authenticating or fetching datasets: {e}")
         return
