@@ -49,6 +49,7 @@ def fetch_trending():
             'downloadCount': int(d.get('downloadCount', 0)),
             'voteCount': int(d.get('voteCount', 0)),
             'viewCount': int(d.get('viewCount', 0)),
+            'ownerName': d.get('ownerName', 'N/A'),
             'url': d.get('url', f"https://www.kaggle.com/datasets/{d.get('ref', '')}"),
             'fetch_date': datetime.now().isoformat()
         })
