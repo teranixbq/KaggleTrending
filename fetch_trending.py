@@ -23,31 +23,33 @@ def fetch_trending():
 
     # Extract relevant data
     data_list = []
-    for i, ds in enumerate(datasets):
-        # DEBUG: Print the raw dictionary of the first 2 datasets to logs
-        if i < 2:
-            print(f"\n--- DEBUG DATASET {i} ---")
-            import pprint
-            # Kaggle API objects often have a __dict__ or to_dict() method
-            if hasattr(ds, 'to_dict'):
-                pprint.pprint(ds.to_dict())
+    for ds in datasets:
+        # Helper to convert bytes to human readable format
+        total_bytes = getattr(ds, 'totalBytes', 0)
+        if total_bytes:
+            if total_bytes < 1024:
+                size_str = f"{total_bytes} B"
+            elif total_bytes < 1024**2:
+                size_str = f"{total_bytes/1024:.1f} KB"
+            elif total_bytes < 1024**3:
+                size_str = f"{total_bytes/1024**2:.1f} MB"
             else:
-                pprint.pprint(vars(ds))
-            print("------------------------\n")
+                size_str = f"{total_bytes/1024**3:.1f} GB"
+        else:
+            size_str = "N/A"
 
         data_list.append({
             'ref': getattr(ds, 'ref', ''),
-            'title': getattr(ds, 'title', ''),
-            'size': getattr(ds, 'size', 'N/A'),
-            'lastUpdated': str(getattr(ds, 'lastUpdated', 'N/A')),
+            'title': getattr(ds, 'title', '').strip(),
+            'size': size_str,
+            'lastUpdated': getattr(ds, 'lastUpdated', 'N/A'),
             'downloadCount': int(getattr(ds, 'downloadCount', 0)),
             'voteCount': int(getattr(ds, 'voteCount', 0)),
             'viewCount': int(getattr(ds, 'viewCount', 0)),
             'usabilityRating': float(getattr(ds, 'usabilityRating', 0)),
             'ownerName': getattr(ds, 'ownerName', 'N/A'),
-            'ownerRef': getattr(ds, 'ownerRef', 'N/A'),
             'kernelCount': int(getattr(ds, 'kernelCount', 0)),
-            'url': f"https://www.kaggle.com/datasets/{getattr(ds, 'ref', '')}",
+            'url': getattr(ds, 'url', f"https://www.kaggle.com/datasets/{getattr(ds, 'ref', '')}"),
             'fetch_date': datetime.now().isoformat()
         })
 
